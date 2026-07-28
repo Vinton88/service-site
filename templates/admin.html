@@ -1,0 +1,110 @@
+{% set request_rows = requests|default(requests_list|default(entries|default([], true), true), true) %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#090b11">
+    <title>Заявки — панель администратора</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body class="page page--admin">
+    <a class="skip-link" href="#main-content">Перейти к заявкам</a>
+    <div class="ambient ambient--one" aria-hidden="true"></div>
+
+    <main class="admin-shell" id="main-content">
+        <header class="admin-header">
+            <div>
+                <p class="eyebrow">Локальная панель</p>
+                <h1>Заявки</h1>
+                <p class="admin-header__subtitle">Все обращения, новые — в начале списка.</p>
+            </div>
+            <div class="admin-header__actions">
+                <span class="request-count">
+                    <strong>{{ request_rows|length }}</strong>
+                    {{ 'заявка' if request_rows|length == 1 else 'заявок' }}
+                </span>
+                <a class="secondary-link" href="{{ url_for('index') }}">
+                    <span aria-hidden="true">←</span>
+                    На главную
+                </a>
+            </div>
+        </header>
+
+        {% if request_rows %}
+            <div class="table-shell">
+                <table class="requests-table">
+                    <caption class="visually-hidden">Сохранённые заявки клиентов</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Дата</th>
+                            <th scope="col">Клиент</th>
+                            <th scope="col">Контакты</th>
+                            <th scope="col">Проект</th>
+                            <th scope="col">Опции</th>
+                            <th scope="col">Стоимость</th>
+                            <th scope="col">Комментарий</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in request_rows %}
+                            <tr>
+                                <td data-label="ID">
+                                    <span class="request-id">#{{ row['id'] }}</span>
+                                </td>
+                                <td data-label="Дата">
+                                    <time class="request-date">{{ row['created_at'] }}</time>
+                                </td>
+                                <td data-label="Клиент">
+                                    <strong class="request-name">{{ row['name'] }}</strong>
+                                </td>
+                                <td data-label="Контакты">
+                                    <div class="contact-stack">
+                                        <a href="tel:{{ row['phone'] }}">{{ row['phone'] }}</a>
+                                        {% if row['email'] %}
+                                            <a href="mailto:{{ row['email'] }}">{{ row['email'] }}</a>
+                                        {% else %}
+                                            <span class="muted-value">Email не указан</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td data-label="Проект">
+                                    <span class="service-badge">{{ row['service'] }}</span>
+                                </td>
+                                <td data-label="Опции">
+                                    {% if row['options'] %}
+                                        <div class="option-tags js-options">{{ row['options'] }}</div>
+                                    {% else %}
+                                        <span class="muted-value">Без опций</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Стоимость">
+                                    <strong class="price-value">{{ "{:,}".format(row['total_price']|int).replace(",", " ") }} ₽</strong>
+                                </td>
+                                <td data-label="Комментарий">
+                                    {% if row['comment'] %}
+                                        <p class="request-comment">{{ row['comment'] }}</p>
+                                    {% else %}
+                                        <span class="muted-value">Не указан</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <section class="empty-state">
+                <div class="empty-state__icon" aria-hidden="true">↗</div>
+                <p class="eyebrow">Пока тихо</p>
+                <h2>Заявок пока нет</h2>
+                <p>Когда посетитель отправит форму, обращение появится здесь.</p>
+                <a class="primary-link" href="{{ url_for('index') }}">Открыть главную</a>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>

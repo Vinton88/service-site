@@ -1,0 +1,369 @@
+{% set form_data = form_data|default({}, true) %}
+{% set errors = errors|default({}, true) %}
+{% set default_services = {
+    'landing': {'name': 'Одностраничный сайт-визитка', 'price': 30000},
+    'store': {'name': 'Интернет-магазин', 'price': 80000},
+    'ai_agent': {'name': 'ИИ-агент для переписки', 'price': 65000}
+} %}
+{% set default_options = {
+    'crm': {'name': 'Интеграция с CRM', 'price': 20000},
+    'messengers': {'name': 'Интеграция с Telegram / WhatsApp', 'price': 25000},
+    'payments': {'name': 'Подключение онлайн-оплаты', 'price': 15000},
+    'urgent': {'name': 'Срочная разработка', 'price': 30000}
+} %}
+{% set service_catalog = services|default(default_services, true) %}
+{% set option_catalog = extra_options|default(options|default(default_options, true), true) %}
+{% set selected_service = form_data.get('service', 'landing') %}
+{% set selected_options = form_data.get('options', []) %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Разработка сайтов, интернет-магазинов и ИИ-агентов для бизнеса. Рассчитайте стоимость проекта и оставьте заявку.">
+    <meta name="theme-color" content="#090b11">
+    <title>Иван Петров — разработка и автоматизация</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body class="page page--home">
+    <a class="skip-link" href="#main-content">Перейти к содержимому</a>
+
+    <div class="ambient ambient--one" aria-hidden="true"></div>
+    <div class="ambient ambient--two" aria-hidden="true"></div>
+
+    <main class="site-shell" id="main-content">
+        <aside class="profile-panel" aria-labelledby="profile-title">
+            <div class="profile-panel__inner">
+                <div class="availability">
+                    <span class="availability__dot" aria-hidden="true"></span>
+                    Открыт к новым проектам
+                </div>
+
+                <div class="avatar" data-avatar>
+                    <span class="avatar__fallback" aria-hidden="true" data-avatar-fallback>ИП</span>
+                    <img
+                        class="avatar__image"
+                        src="{{ url_for('static', filename='avatar.jpg') }}"
+                        alt="Иван Петров"
+                        width="188"
+                        height="188"
+                        data-avatar-image
+                    >
+                </div>
+
+                <p class="eyebrow">Разработка · Автоматизация</p>
+                <h1 class="profile-title" id="profile-title">Иван Петров</h1>
+                <p class="profile-description">
+                    Веб-разработчик и инженер автоматизации. Помогаю бизнесу
+                    внедрять ИИ-агентов и оптимизировать процессы.
+                </p>
+
+                <nav class="social-links" aria-label="Социальные сети и контакты">
+                    <a class="social-link" href="#" data-placeholder-link aria-label="Telegram — ссылка скоро появится">
+                        <span class="social-link__icon" aria-hidden="true">TG</span>
+                        <span>Telegram</span>
+                        <span class="social-link__arrow" aria-hidden="true">↗</span>
+                    </a>
+                    <a class="social-link" href="#" data-placeholder-link aria-label="Instagram — ссылка скоро появится">
+                        <span class="social-link__icon" aria-hidden="true">IG</span>
+                        <span>Instagram</span>
+                        <span class="social-link__arrow" aria-hidden="true">↗</span>
+                    </a>
+                    <a class="social-link" href="#" data-placeholder-link aria-label="YouTube — ссылка скоро появится">
+                        <span class="social-link__icon" aria-hidden="true">YT</span>
+                        <span>YouTube</span>
+                        <span class="social-link__arrow" aria-hidden="true">↗</span>
+                    </a>
+                    <a class="social-link" href="#" data-placeholder-link aria-label="WhatsApp — ссылка скоро появится">
+                        <span class="social-link__icon" aria-hidden="true">WA</span>
+                        <span>WhatsApp</span>
+                        <span class="social-link__arrow" aria-hidden="true">↗</span>
+                    </a>
+                    <a class="social-link social-link--wide" href="#" data-placeholder-link aria-label="Email — адрес скоро появится">
+                        <span class="social-link__icon" aria-hidden="true">@</span>
+                        <span>Email</span>
+                        <span class="social-link__arrow" aria-hidden="true">↗</span>
+                    </a>
+                </nav>
+                <p class="social-status" aria-live="polite" data-social-status></p>
+            </div>
+        </aside>
+
+        <section class="project-panel" aria-labelledby="calculator-title">
+            <header class="section-heading">
+                <p class="eyebrow">Оценка проекта</p>
+                <h2 id="calculator-title">Калькулятор стоимости</h2>
+                <p>Выберите задачу и необходимые интеграции — предварительная смета обновится сразу.</p>
+            </header>
+
+            <section class="work-scope" aria-labelledby="work-scope-title">
+                <div class="work-scope__heading">
+                    <p class="eyebrow">Работа под ключ</p>
+                    <h3 id="work-scope-title">Что входит в работу</h3>
+                </div>
+                <ol class="work-scope__grid">
+                    <li class="work-scope__card">
+                        <span class="work-scope__number" aria-hidden="true">01</span>
+                        <span>Анализ задачи и подбор решения</span>
+                    </li>
+                    <li class="work-scope__card">
+                        <span class="work-scope__number" aria-hidden="true">02</span>
+                        <span>Создание сайта или ИИ-агента</span>
+                    </li>
+                    <li class="work-scope__card">
+                        <span class="work-scope__number" aria-hidden="true">03</span>
+                        <span>Настройка интеграций</span>
+                    </li>
+                    <li class="work-scope__card">
+                        <span class="work-scope__number" aria-hidden="true">04</span>
+                        <span>Запуск и базовая инструкция по использованию</span>
+                    </li>
+                </ol>
+            </section>
+
+            {% if errors %}
+                <div class="form-alert" role="alert" tabindex="-1" data-error-summary>
+                    <span class="form-alert__icon" aria-hidden="true">!</span>
+                    <div>
+                        <strong>Проверьте данные заявки</strong>
+                        <ul>
+                            {% for field, message in errors.items() %}
+                                {% if message %}
+                                    <li>
+                                        {% if message is string %}
+                                            {{ message }}
+                                        {% else %}
+                                            {{ message|join(' ') }}
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+
+            <form class="request-form" id="request-form" action="{{ url_for('submit') }}" method="post">
+                <section class="form-section" aria-labelledby="service-heading">
+                    <div class="form-section__heading">
+                        <span class="step-number" aria-hidden="true">01</span>
+                        <div>
+                            <h3 id="service-heading">Базовая услуга</h3>
+                            <p>Основа будущего проекта</p>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="service">Выберите услугу</label>
+                        <div class="select-wrap">
+                            <select
+                                id="service"
+                                name="service"
+                                required
+                                aria-invalid="{{ 'true' if errors.get('service') else 'false' }}"
+                                aria-describedby="service-error"
+                                data-service-select
+                            >
+                                {% for service_key, service in service_catalog.items() %}
+                                    {% if service is mapping %}
+                                        {% set service_name = service.get('name', service.get('label', service.get('title', service_key))) %}
+                                        {% set service_price = service.get('price', 0) %}
+                                    {% elif service is sequence and service is not string %}
+                                        {% set service_name = service[0] %}
+                                        {% set service_price = service[1] %}
+                                    {% else %}
+                                        {% set service_name = default_services.get(service_key, {}).get('name', service_key) %}
+                                        {% set service_price = service %}
+                                    {% endif %}
+                                    <option
+                                        value="{{ service_key }}"
+                                        data-price="{{ service_price|int }}"
+                                        {% if selected_service == service_key %}selected{% endif %}
+                                    >
+                                        {{ service_name }} — {{ "{:,}".format(service_price|int).replace(",", " ") }} ₽
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <span class="select-wrap__arrow" aria-hidden="true">⌄</span>
+                        </div>
+                        <p class="field-error" id="service-error" data-error-for="service" aria-live="polite">{{ errors.get('service', '') }}</p>
+                    </div>
+                </section>
+
+                <section class="form-section" aria-labelledby="options-heading">
+                    <div class="form-section__heading">
+                        <span class="step-number" aria-hidden="true">02</span>
+                        <div>
+                            <h3 id="options-heading">Дополнительные опции</h3>
+                            <p>Можно выбрать несколько</p>
+                        </div>
+                    </div>
+
+                    <fieldset class="options-grid" aria-describedby="options-error">
+                        <legend class="visually-hidden">Дополнительные опции проекта</legend>
+                        {% for option_key, option in option_catalog.items() %}
+                            {% if option is mapping %}
+                                {% set option_name = option.get('name', option.get('label', option.get('title', option_key))) %}
+                                {% set option_price = option.get('price', 0) %}
+                            {% elif option is sequence and option is not string %}
+                                {% set option_name = option[0] %}
+                                {% set option_price = option[1] %}
+                            {% else %}
+                                {% set option_name = default_options.get(option_key, {}).get('name', option_key) %}
+                                {% set option_price = option %}
+                            {% endif %}
+                            <label class="option-card">
+                                <input
+                                    class="option-card__input"
+                                    type="checkbox"
+                                    name="options"
+                                    value="{{ option_key }}"
+                                    data-price="{{ option_price|int }}"
+                                    {% if option_key in selected_options %}checked{% endif %}
+                                >
+                                <span class="option-card__control" aria-hidden="true">
+                                    <span>✓</span>
+                                </span>
+                                <span class="option-card__content">
+                                    <span class="option-card__name">{{ option_name }}</span>
+                                    <span class="option-card__price">+{{ "{:,}".format(option_price|int).replace(",", " ") }} ₽</span>
+                                </span>
+                            </label>
+                        {% endfor %}
+                    </fieldset>
+                    <p class="field-error" id="options-error" data-error-for="options" aria-live="polite">{{ errors.get('options', '') }}</p>
+                </section>
+
+                <section class="estimate" aria-labelledby="estimate-title">
+                    <div class="estimate__details">
+                        <p class="estimate__label" id="estimate-title">Предварительная смета</p>
+                        <dl>
+                            <div>
+                                <dt>Базовая услуга</dt>
+                                <dd data-base-total>30 000 ₽</dd>
+                            </div>
+                            <div>
+                                <dt>Дополнительные опции</dt>
+                                <dd data-options-total>0 ₽</dd>
+                            </div>
+                        </dl>
+                    </div>
+                    <div class="estimate__total" aria-live="polite" aria-atomic="true">
+                        <span>Итоговая стоимость:</span>
+                        <strong data-total>30 000 ₽</strong>
+                    </div>
+                    <p class="estimate__note">Точная смета — после короткого обсуждения задачи.</p>
+                    <input type="hidden" name="total_price" value="30000" data-total-input>
+                </section>
+
+                <section class="form-section form-section--contact" id="contact" aria-labelledby="contact-heading">
+                    <div class="form-section__heading">
+                        <span class="step-number" aria-hidden="true">03</span>
+                        <div>
+                            <h3 id="contact-heading">Расскажите о задаче</h3>
+                            <p>Отвечу и предложу следующий шаг</p>
+                        </div>
+                    </div>
+
+                    <div class="fields-grid">
+                        <div class="field">
+                            <label class="field-label" for="name">
+                                Имя <span aria-hidden="true">*</span>
+                            </label>
+                            <input
+                                id="name"
+                                name="name"
+                                type="text"
+                                value="{{ form_data.get('name', '') }}"
+                                placeholder="Как к вам обращаться"
+                                autocomplete="name"
+                                required
+                                minlength="2"
+                                maxlength="100"
+                                aria-invalid="{{ 'true' if errors.get('name') else 'false' }}"
+                                aria-describedby="name-error"
+                            >
+                            <p class="field-error" id="name-error" data-error-for="name" aria-live="polite">{{ errors.get('name', '') }}</p>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label" for="phone">
+                                Телефон <span aria-hidden="true">*</span>
+                            </label>
+                            <input
+                                id="phone"
+                                name="phone"
+                                type="tel"
+                                value="{{ form_data.get('phone', '') }}"
+                                placeholder="+7 999 000-00-00"
+                                autocomplete="tel"
+                                inputmode="tel"
+                                required
+                                minlength="7"
+                                maxlength="40"
+                                aria-invalid="{{ 'true' if errors.get('phone') else 'false' }}"
+                                aria-describedby="phone-hint phone-error"
+                            >
+                            <p class="field-hint" id="phone-hint">Не менее 7 цифр</p>
+                            <p class="field-error" id="phone-error" data-error-for="phone" aria-live="polite">{{ errors.get('phone', '') }}</p>
+                        </div>
+
+                        <div class="field field--wide">
+                            <label class="field-label" for="email">
+                                Email <span class="field-label__optional">необязательно</span>
+                            </label>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                value="{{ form_data.get('email', '') }}"
+                                placeholder="you@example.com"
+                                autocomplete="email"
+                                maxlength="254"
+                                aria-invalid="{{ 'true' if errors.get('email') else 'false' }}"
+                                aria-describedby="email-error"
+                            >
+                            <p class="field-error" id="email-error" data-error-for="email" aria-live="polite">{{ errors.get('email', '') }}</p>
+                        </div>
+
+                        <div class="field field--wide">
+                            <label class="field-label" for="comment">
+                                Комментарий <span class="field-label__optional">необязательно</span>
+                            </label>
+                            <textarea
+                                id="comment"
+                                name="comment"
+                                rows="5"
+                                maxlength="2000"
+                                placeholder="Коротко опишите задачу, сроки или важные детали"
+                                aria-invalid="{{ 'true' if errors.get('comment') else 'false' }}"
+                                aria-describedby="comment-counter comment-error"
+                            >{{ form_data.get('comment', '') }}</textarea>
+                            <div class="field-meta">
+                                <p class="field-error" id="comment-error" data-error-for="comment" aria-live="polite">{{ errors.get('comment', '') }}</p>
+                                <span class="character-counter" id="comment-counter" data-character-counter>0 / 2000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="submit-button" type="submit" data-submit-button>
+                        <span data-submit-label>Обсудить проект</span>
+                        <span class="submit-button__arrow" aria-hidden="true">→</span>
+                        <span class="submit-button__spinner" aria-hidden="true"></span>
+                    </button>
+                    <p class="privacy-note">
+                        Нажимая кнопку, вы отправляете данные только для связи по этой заявке.
+                    </p>
+                </section>
+            </form>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <span>© {{ current_year|default(2026) }} Иван Петров</span>
+        <span aria-hidden="true">·</span>
+        <span>Проекты, которые работают</span>
+    </footer>
+</body>
+</html>

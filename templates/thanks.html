@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Заявка успешно отправлена.">
+    <meta name="theme-color" content="#090b11">
+    <title>Заявка отправлена — Иван Петров</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="page page--centered">
+    <a class="skip-link" href="#main-content">Перейти к содержимому</a>
+    <div class="ambient ambient--one" aria-hidden="true"></div>
+    <div class="ambient ambient--two" aria-hidden="true"></div>
+
+    <main class="message-card" id="main-content">
+        <div class="success-mark" aria-hidden="true">
+            <span>✓</span>
+        </div>
+        <p class="eyebrow">Заявка принята</p>
+        <h1>Спасибо!</h1>
+        <p class="message-card__text">
+            Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.
+        </p>
+        <div class="message-card__divider" aria-hidden="true"></div>
+        <p class="message-card__note">
+            Можно спокойно закрыть эту страницу — данные уже сохранены.
+        </p>
+        <a class="primary-link" href="{{ url_for('index') }}">
+            <span aria-hidden="true">←</span>
+            Вернуться на главную
+        </a>
+    </main>
+</body>
+</html>
