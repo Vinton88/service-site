@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import hmac
+import json
 import os
 import re
 import sqlite3
+import urllib.error
+import urllib.request
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
 from typing import Any, Callable, TypeVar
 
+from dotenv import load_dotenv
 from flask import (
     Flask,
     Response,
@@ -20,12 +24,19 @@ from flask import (
     url_for,
 )
 
+# Loads variables from a local .env file (if present) into the process
+# environment before any os.environ.get() calls below read them.
+load_dotenv()
+
 
 BASE_DIR = Path(__file__).resolve().parent
 DEFAULT_DATABASE_PATH = BASE_DIR / "data" / "requests.db"
 
 DEFAULT_ADMIN_USERNAME = "demo_admin"
 DEFAULT_ADMIN_PASSWORD = "ChangeMe-LocalDemo-9f3!"
+
+TELEGRAM_API_BASE = "https://api.telegram.org"
+TELEGRAM_REQUEST_TIMEOUT_SECONDS = 5
 
 SERVICES: dict[str, dict[str, Any]] = {
     "landing": {
@@ -250,6 +261,57 @@ def calculate_total(service: str, options: list[str]) -> int:
     return service_price + options_price
 
 
+def notify_owner_telegram(
+    *,
+    name: str,
+    phone: str,
+    service_label: str,
+    total_price: int,
+    comment: str,
+) -> None:
+    """Best-effort Telegram notification for the site owner.
+
+    Must never raise: a saved request is already committed to the database,
+    and a Telegram outage or missing configuration must not affect the
+    response returned to the visitor.
+    """
+    bot_token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+    if not bot_token or not chat_id:
+        return
+
+    message = "\n".join(
+        [
+            "Новая заявка с сайта service-site",
+            "",
+            f"Имя: {name}",
+            f"Телефон: {phone}",
+            f"Услуга: {service_label}",
+            f"Стоимость: {format_price(total_price)} ₽",
+            f"Комментарий: {comment}",
+        ]
+    )
+
+    url = f"{TELEGRAM_API_BASE}/bot{bot_token}/sendMessage"
+    payload = json.dumps({"chat_id": chat_id, "text": message}).encode("utf-8")
+    http_request = urllib.request.Request(
+        url,
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(
+            http_request, timeout=TELEGRAM_REQUEST_TIMEOUT_SECONDS
+        ) as response:
+            response.read()
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        current_app.logger.warning("Telegram notification failed: %s", exc)
+    except Exception:  # noqa: BLE001 - notification must never break submit()
+        current_app.logger.exception("Unexpected error while notifying Telegram")
+
+
 F = TypeVar("F", bound=Callable[..., Any])
 
 
@@ -350,6 +412,14 @@ def submit() -> tuple[str, int] | Response:
         ),
     )
     db.commit()
+
+    notify_owner_telegram(
+        name=data["name"],
+        phone=data["phone"],
+        service_label=service_label,
+        total_price=total_price,
+        comment=data["comment"],
+    )
 
     return redirect(url_for("thanks"), code=303)
 

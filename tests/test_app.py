@@ -35,6 +35,11 @@ class ServiceSiteTestCase(unittest.TestCase):
                 "DATABASE_PATH": str(self.database_path),
                 "ADMIN_USERNAME": TEST_ADMIN_USERNAME,
                 "ADMIN_PASSWORD": TEST_ADMIN_PASSWORD,
+                # Force-disable Telegram notifications during tests so a
+                # developer's real .env credentials never cause the test
+                # suite to send live messages or hit the network.
+                "TELEGRAM_BOT_TOKEN": "",
+                "TELEGRAM_CHAT_ID": "",
             },
             clear=False,
         )
@@ -386,6 +391,24 @@ class ServiceSiteTestCase(unittest.TestCase):
         self.assertIn("&lt;img", html)
         self.assertNotIn('<script>alert("x")</script>', html)
         self.assertNotIn("<img src=x onerror=alert(1)>", html)
+
+    def test_submission_succeeds_when_telegram_is_unreachable(self) -> None:
+        with mock.patch.dict(
+            os.environ,
+            {"TELEGRAM_BOT_TOKEN": "test-token", "TELEGRAM_CHAT_ID": "12345"},
+        ):
+            with mock.patch.object(
+                self.app_module.urllib.request,
+                "urlopen",
+                side_effect=OSError("network unreachable"),
+            ):
+                response = self.client.post(
+                    "/submit", data=self.valid_form()
+                )
+
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.headers["Location"], "/thanks")
+        self.assertEqual(self.request_count(), 1)
 
     def test_admin_shows_newest_request_first(self) -> None:
         first_response = self.client.post(
