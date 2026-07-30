@@ -398,11 +398,9 @@ class ServiceSiteTestCase(unittest.TestCase):
             {"TELEGRAM_BOT_TOKEN": "test-token", "TELEGRAM_CHAT_ID": "12345"},
         ):
             with mock.patch.object(
-                self.app_module.requests,
-                "post",
-                side_effect=self.app_module.requests.exceptions.ConnectionError(
-                    "network unreachable"
-                ),
+                self.app_module.urllib.request,
+                "urlopen",
+                side_effect=OSError("network unreachable"),
             ):
                 response = self.client.post(
                     "/submit", data=self.valid_form()
