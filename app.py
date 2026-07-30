@@ -1,17 +1,15 @@
 from __future__ import annotations
 
 import hmac
-import json
 import os
 import re
 import sqlite3
-import urllib.error
-import urllib.request
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
 from typing import Any, Callable, TypeVar
 
+import requests
 from dotenv import load_dotenv
 from flask import (
     Flask,
@@ -293,20 +291,20 @@ def notify_owner_telegram(
     )
 
     url = f"{TELEGRAM_API_BASE}/bot{bot_token}/sendMessage"
-    payload = json.dumps({"chat_id": chat_id, "text": message}).encode("utf-8")
-    http_request = urllib.request.Request(
-        url,
-        data=payload,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
+    # Optional outbound proxy for hosts where api.telegram.org is not
+    # directly reachable, e.g. "socks5h://127.0.0.1:1080". Unset by default.
+    proxy_url = os.environ.get("TELEGRAM_PROXY_URL", "").strip()
+    proxies = {"https": proxy_url} if proxy_url else None
 
     try:
-        with urllib.request.urlopen(
-            http_request, timeout=TELEGRAM_REQUEST_TIMEOUT_SECONDS
-        ) as response:
-            response.read()
-    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        response = requests.post(
+            url,
+            json={"chat_id": chat_id, "text": message},
+            proxies=proxies,
+            timeout=TELEGRAM_REQUEST_TIMEOUT_SECONDS,
+        )
+        response.raise_for_status()
+    except requests.exceptions.RequestException as exc:
         current_app.logger.warning("Telegram notification failed: %s", exc)
     except Exception:  # noqa: BLE001 - notification must never break submit()
         current_app.logger.exception("Unexpected error while notifying Telegram")
